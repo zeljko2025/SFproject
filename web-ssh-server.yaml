@@ -1,0 +1,56 @@
+---
+- name: Install web and SSH server
+  hosts: all
+  become: yes
+  vars:
+    external_interface: "enp1s25"
+    external_ip: "{{ ansible_facts[external_interface]['ipv4']['address'] }}"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Apache web server
+      apt:
+        name: apache2
+        state: present
+
+    - name: Configure Apache to listen on external IP only
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        regexp: '^Listen '
+        line: "Listen {{ external_ip }}:80"
+      notify: Restart Apache
+
+    - name: Install SSH server
+      apt:
+        name: openssh-server
+        state: present
+
+    - name: Configure SSH to listen on external IP only
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^ListenAddress '
+        line: "ListenAddress {{ external_ip }}"
+      notify: Restart SSH
+
+    - name: Ensure SSH and Apache are enabled and started
+      service:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      loop:
+        - ssh
+        - apache2
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+
+    - name: Restart SSH
+      service:
+        name: ssh
+        state: restarted
