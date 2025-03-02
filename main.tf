@@ -1,5 +1,3 @@
-terraform {
-
 provider "aws" {
   region = "eu-north-1"
 }
@@ -104,5 +102,4 @@ resource "aws_instance" "ubuntu_server" {
   tags = {
     Name = "UbuntuVM"
   }
-}
 }
