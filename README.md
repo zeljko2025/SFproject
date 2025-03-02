@@ -15,5 +15,6 @@ $sudo ip addr add 10.0.2.10/24 dev enp2.150
 $sudo ip link set dev enp2.150 up
 
 
-Ansible code is located in "web-ssh-server.yaml" file. Besides it we need to create inventory.ini file where IP address of the server(s) which we want to perform our code against. 
-To perform Ansible code we need to issue a command: "ansible-playbook -i inventory.ini web-ssh-server.yaml" 
+Ansible code is located in "web-ssh-server.yaml" and hardening.yml files. Besides it we need to create inventory.ini file where IP address of the server(s) which we want to perform our code against. 
+To perform Ansible code we need to issue a command: "ansible-playbook -i inventory.ini web-ssh-server.yaml/hardening.yml"
+In hardening.yml file, we are updating the system, allowing ssh through firewall, allowing additional ports, disabling root login and changing ssh default port to higher one.
