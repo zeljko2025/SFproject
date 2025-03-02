@@ -1,0 +1,35 @@
+---
+- name: Update and upgrade all packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+    autoremove: yes
+
+- name: Enable UFW and allow SSH
+  ufw:
+    rule: allow
+    name: OpenSSH
+    state: enabled
+
+- name: Allow additional ports (e.g., HTTP, HTTPS)
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+  loop:
+    - 80
+    - 443
+
+- name: Disable root login and change SSH port
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
+    - { regexp: '^#?Port', line: 'Port 222' }
+  notify: Restart SSH
+
+- name: Restart SSH service
+  service:
+    name: sshd
+    state: restarted
